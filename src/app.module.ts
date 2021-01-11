@@ -35,12 +35,11 @@ import { User } from './users/entities/user.entity';
       database: process.env.DB_NAME,
       synchronize: process.env.NODE_ENV !== 'prod',
       logging: process.env.NODE_ENV !== 'prod',
-      entities: [User, Restaurant]
+      entities: [User]
     }),
     GraphQLModule.forRoot({
       autoSchemaFile: true,
     }),
-    RestaurantsModule,
     UsersModule,
     CommonModule,
   ],
