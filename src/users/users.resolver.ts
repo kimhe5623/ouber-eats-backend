@@ -3,8 +3,10 @@ import { Args, Context, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { AuthUser } from "src/auth/auth-user.decorator";
 import { AuthGuard } from "src/auth/auth.guard";
 import { CreateAccountInput, CreateAccountOutput } from "./dtos/create-account.dto";
+import { EditProfileInput, EditProfileOutput } from "./dtos/edit-profile.dto";
 import { LoginInput, LoginOutput } from "./dtos/login.dto";
 import { UserProfileInput, UserProfileOutput } from "./dtos/user-profile.dto";
+import { VerifyEmailInput, VerifyEmailOutput } from "./dtos/verify-email.dto";
 import { User } from "./entities/user.entity";
 import { UsersService } from "./users.service"
 
@@ -16,25 +18,14 @@ export class UserResolver {
     async createAccount(
         @Args('input') createAccountInput: CreateAccountInput
     ): Promise<CreateAccountOutput> {
-        try {
-            return await this.usersService.createAccount(createAccountInput);
-        } catch (error) {
-            return {
-                ok: false,
-                error
-            };
-        }
+        return this.usersService.createAccount(createAccountInput);
     }
 
     @Mutation(returns => LoginOutput)
     async login(
         @Args('input') loginInput: LoginInput
     ): Promise<LoginOutput> {
-        try {
-                return await this.usersService.login(loginInput);
-           } catch(error) {
-                return { ok: false, error };
-           }
+        return this.usersService.login(loginInput);
     }
 
     @UseGuards(AuthGuard)
@@ -47,20 +38,23 @@ export class UserResolver {
     @UseGuards(AuthGuard)
     @Query(returns => UserProfileOutput) 
     async userProfile(@Args() userProfileInput: UserProfileInput): Promise<UserProfileOutput> {
-        try {
-            const user = await this.usersService.findById(userProfileInput.userId);
-            if(!user) {
-                throw Error();
-            }
-            return {
-                ok: true, // If user found, it will be true or false
-                user
-            };
-        } catch(e) {
-            return {
-                ok: false,
-                error: "User Not Found"
-            };
-        }
+        return this.usersService.userProfile(userProfileInput);
     }
+
+    @UseGuards(AuthGuard)
+    @Mutation(returns => EditProfileOutput)
+    async editProfile(
+        @AuthUser() authUser: User, 
+        @Args('input') editProfileInput: EditProfileInput
+        ): Promise<EditProfileOutput> {
+        return this.usersService.editProfile(authUser.id, editProfileInput);
+    }
+
+    @Mutation(returns => VerifyEmailOutput)
+    async verifyEmail(
+        @Args('input') verifyEmailInput: VerifyEmailInput
+    ): Promise<VerifyEmailOutput> {
+        return this.usersService.verifyEmail(verifyEmailInput.code);
+    }
+
 }
