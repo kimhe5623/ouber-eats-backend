@@ -10,15 +10,13 @@ export class MailService {
         @Inject(CONFIG_OPTIONS) private readonly options: MailModuleOptions
     ) {}
 
-    private async sendEmail(subject: string, template: string, emailVar: EmailVar[]) {
+    private async sendEmail(subject: string, to: string, template: string, emailVar: EmailVar[]) {
         const form = new FormData();
         form.append("from", `Ouber eats <mailgun@${this.options.domain}>`);
-        form.append("to", `fancy.hy0eun@gmail.com`);
+        form.append("to", to);
         form.append("subject", subject);
         form.append("template", template);
-        form.append("v:code", "1k2j3lk2");
-        form.append("v:username", "kimhe5623");
-        emailVar.forEach(eVar => form.append(eVar.key, eVar.value));
+        emailVar.forEach(eVar => form.append(`v:${eVar.key}`, eVar.value));
         
         try {
             await got(`https://api.mailgun.net/v3/${this.options.domain}/messages`, {
@@ -31,5 +29,12 @@ export class MailService {
         } catch(error) {
             console.log(error);
         }
+    }
+
+    sendVerificationEmail(email: string, code: string) {
+        this.sendEmail("Verify your Email", email, "verify-email", [
+            { key: 'code', value: code },
+            { key: 'username', value: email }
+        ]);
     }
 }
