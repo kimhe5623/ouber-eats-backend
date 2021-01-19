@@ -18,14 +18,14 @@ export class UsersService {
         @InjectRepository(Verification) private readonly verifications: Repository<Verification>,
         private readonly jwtService: JwtService,
         private readonly mailService: MailService
-    ){}
+    ) { }
 
     async createAccount(
-        { email, password, role }: CreateAccountInput) 
-        : Promise <CreateAccountOutput> {
+        { email, password, role }: CreateAccountInput)
+        : Promise<CreateAccountOutput> {
         try {
             const exists = await this.users.findOne({ email });
-            if(exists) {
+            if (exists) {
                 return { ok: false, error: "There is a user with that email already" };
             }
             const user = await this.users.save(
@@ -38,49 +38,42 @@ export class UsersService {
 
             return { ok: true };
 
-        } catch(e) {
+        } catch (e) {
             return { ok: false, error: "Couldn't Create account" };
         }
     }
 
     async login(
         { email, password }: LoginInput
-    ): Promise <LoginOutput> {
+    ): Promise<LoginOutput> {
         try {
             const user = await this.users.findOne(
                 { email },
                 { select: ['password', 'id'] }
             );
-            if(!user) {
+            if (!user) {
                 return { ok: false, error: "User not found" };
             }
             const passwordCorrect = await user.checkPassword(password);
-            if(!passwordCorrect) {
-                return { ok: false, error: "Wrong password"};
+            if (!passwordCorrect) {
+                return { ok: false, error: "Wrong password" };
             }
             const token = this.jwtService.sign(user.id);
             return { ok: true, token };
 
-        } catch(error) {
-            return { ok: false, error };
+        } catch (error) {
+            return { ok: false, error: "Can not log user in" };
         }
     }
 
-    async findById(id: number): Promise<User> {
-        return this.users.findOne({ id });
-    }
-
-    async userProfile({ userId }: UserProfileInput): Promise<UserProfileOutput> {
+    async findById({ id }: UserProfileInput): Promise<UserProfileOutput> {
         try {
-            const user = await this.findById(userId);
-            if(!user) {
-                throw Error();
-            }
+            const user = await this.users.findOneOrFail({ id });
             return {
                 ok: true, // If user found, it will be true or false
-                user
+                user,
             };
-        } catch(e) {
+        } catch (e) {
             return {
                 ok: false,
                 error: "User Not Found"
@@ -90,16 +83,18 @@ export class UsersService {
 
     async editProfile(
         userId: number, { email, password }: EditProfileInput
-        ): Promise<EditProfileOutput> {
+    ): Promise<EditProfileOutput> {
         try {
             const user = await this.users.findOne(userId);
             if (email) {
                 user.email = email;
-                if(user.verified == false) {
-                    this.verifications.delete({ user });
-                }
                 user.verified = false;
-                const verification = await this.verifications.save(this.verifications.create({ user }))
+                await this.verifications.delete({
+                    user: { id: user.id }
+                });
+                const verification = await this.verifications.save(
+                    this.verifications.create({ user })
+                );
                 this.mailService.sendVerificationEmail(email, verification.code);
             }
             if (password) {
@@ -108,10 +103,10 @@ export class UsersService {
             this.users.save(user);
             return { ok: true };
 
-        } catch(error) {
+        } catch (error) {
             return {
                 ok: false,
-                error
+                error: "Can not update profile"
             }
         }
     }
@@ -122,7 +117,7 @@ export class UsersService {
                 { code },
                 { relations: ["user"] }
             );
-            if(verification) {
+            if (verification) {
                 verification.user.verified = true
                 await this.users.save(verification.user);
                 await this.verifications.delete(verification.id);
@@ -134,10 +129,10 @@ export class UsersService {
                 ok: false,
                 error: "Incorrect code"
             };
-        } catch(error) {
+        } catch (error) {
             return {
                 ok: false,
-                error
+                error: "Can not verify email"
             };
         }
     }

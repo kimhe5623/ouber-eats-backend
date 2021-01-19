@@ -8,26 +8,30 @@ import got from "got";
 export class MailService {
     constructor(
         @Inject(CONFIG_OPTIONS) private readonly options: MailModuleOptions
-    ) {}
+    ) { }
 
-    private async sendEmail(subject: string, to: string, template: string, emailVar: EmailVar[]) {
+    async sendEmail(subject: string, to: string, template: string, emailVar: EmailVar[]): Promise<boolean> {
         const form = new FormData();
         form.append("from", `Ouber eats <mailgun@${this.options.domain}>`);
         form.append("to", to);
         form.append("subject", subject);
         form.append("template", template);
         emailVar.forEach(eVar => form.append(`v:${eVar.key}`, eVar.value));
-        
+
         try {
-            await got(`https://api.mailgun.net/v3/${this.options.domain}/messages`, {
-                headers: { 
-                    "Authorization": `Basic ${Buffer.from(`api:${this.options.apiKey}`).toString('base64')}`
-                },
-                method: "POST",
-                body: form
-            });
-        } catch(error) {
-            console.log(error);
+            await got.post(
+                `https://api.mailgun.net/v3/${this.options.domain}/messages`,
+                {
+                    headers: {
+                        "Authorization": `Basic ${Buffer.from(`api:${this.options.apiKey}`).toString('base64')}`
+                    },
+                    method: "POST",
+                    body: form
+                });
+            return true;
+
+        } catch (error) {
+            return false;
         }
     }
 
