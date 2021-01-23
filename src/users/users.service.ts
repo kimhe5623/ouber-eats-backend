@@ -68,7 +68,7 @@ export class UsersService {
 
     async findById({ id }: UserProfileInput): Promise<UserProfileOutput> {
         try {
-            const user = await this.users.findOneOrFail({ id });
+            const user = await this.users.findOneOrFail(id);
             return {
                 ok: true, // If user found, it will be true or false
                 user,
