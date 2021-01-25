@@ -4,43 +4,43 @@ The Backend of Ouber Eats Clone
 
 ## User Model
 
-- id
-- createdAt
-- updatedAt
+[x] id
+[x] createdAt
+[x] updatedAt
 
 ---
 
-- email
-- password
-- role(client|owner|delivery)
+[x] email
+[x] password
+[x] role(client|owner|delivery)
 
 ## User CRUD
 
-- Create Account
-- Log In
-- See Profile
-- Verify Email
+[x] Create Account
+[x] Log In
+[x] See Profile
+[x] Verify Email
 
 ## Retaurant Model
 
-- name
-- category
-- address
-- coverImage
+[x] name
+[x] category
+[x] address
+[x] coverImage
 
 ## Restaurant CRUD
 
-- See Categories
-- See Restaurants by Category (pagination)
-- See Restaurants (pagination)
-- See Restaurant
+[x] See Categories
+[x] See Restaurants by Category (pagination)
+[x] See Restaurants (pagination)
+[x] See Restaurant
 
-- Edit Restaurant
-- Delete Restaurant
+[x] Edit Restaurant
+[x] Delete Restaurant
 
-- Create Dish
-- Edit Dish
-- Delete Dish
+[x] Create Dish
+[x] Edit Dish
+[x] Delete Dish
 
 - Orders CRUD
 - Orders Subscription (Owner, Client, Delivery)

@@ -8,7 +8,9 @@ import { AllCategoriesOutput } from "./dtos/all-categories.dto";
 import { CategoryInput, CategoryOutput } from "./dtos/category.dto";
 import { CreateDishInput, CreateDishOutput } from "./dtos/create-dish.dto";
 import { CreateRestaurantInput } from "./dtos/create-restaurant.dto";
+import { DeleteDishInput, DeleteDishOutput } from "./dtos/delete-dish.dto";
 import { DeleteRestaurantInput, DeleteRestaurantOutput } from "./dtos/delete-restaurant.dto";
+import { EditDishInput, EditDishOutput } from "./dtos/edit-dish.dto";
 import { EditRestaurantInput, EditRestaurantOutput } from './dtos/edit-restaurant.dto'
 import { RestaurantInput, RestaurantOutput } from "./dtos/restaurant.dto";
 import { RestaurantsOutput, RestaurantsInput } from "./dtos/restaurants.dto";
@@ -105,6 +107,24 @@ export class DishResolver {
         @Args('input') createDishInput: CreateDishInput
     ): Promise<CreateDishOutput> {
         return this.restaurantService.createDish(owner, createDishInput);
+    }
+
+    @Mutation(type => EditDishOutput)
+    @Role(["Owner"])
+    async editDish(
+        @AuthUser() owner,
+        @Args('input') editDishInput: EditDishInput
+    ): Promise<EditDishOutput> {
+        return this.restaurantService.editDish(owner, editDishInput);
+    }
+
+    @Mutation(type => DeleteDishOutput)
+    @Role(["Owner"])
+    async deleteDish(
+        @AuthUser() owner,
+        @Args('input') deleteDishInput: DeleteDishInput
+    ): Promise<DeleteDishOutput> {
+        return this.restaurantService.deleteDish(owner, deleteDishInput);
     }
     
 }
