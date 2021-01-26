@@ -10,45 +10,45 @@ import { Dish } from "./dish.entity";
 @InputType('RestaurantInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
-export class Restaurant extends CoreEntity{
-    @Field(type => String, { nullable: true })
-    @Column()
-    @IsString()
-    @Length(5)
-    name: string;
+export class Restaurant extends CoreEntity {
+  @Field(type => String, { nullable: true })
+  @Column()
+  @IsString()
+  @Length(5)
+  name: string;
 
-    @Field(type => String)
-    @Column()
-    @IsString()
-    coverImage: string;
+  @Field(type => String)
+  @Column()
+  @IsString()
+  coverImage: string;
 
-    @Field(type => String, { nullable: true })
-    @Column()
-    @IsString()
-    address: string;
+  @Field(type => String, { nullable: true })
+  @Column()
+  @IsString()
+  address: string;
 
-    @Field(type => Category, { nullable: true })
-    @ManyToOne(
-        type => Category, 
-        category => category.restaurants,
-        { nullable: true, onDelete: "SET NULL"})
-    category: Category;
+  @Field(type => Category, { nullable: true })
+  @ManyToOne(
+    type => Category,
+    category => category.restaurants,
+    { nullable: true, onDelete: "SET NULL" })
+  category: Category;
 
-    @Field(type => User)
-    @ManyToOne(
-        type => User, 
-        user => user.restaurants,
-        { onDelete: "CASCADE"})
-    owner: User;
+  @Field(type => User)
+  @ManyToOne(
+    type => User,
+    user => user.restaurants,
+    { onDelete: "CASCADE" })
+  owner: User;
 
-    @RelationId((restaurant: Restaurant) => restaurant.owner)
-    ownerId: number;
+  @RelationId((restaurant: Restaurant) => restaurant.owner)
+  ownerId: number;
 
-    @OneToMany(type => Dish, dish => dish.restaurant)
-    @Field(type => [Dish])
-    menu: Dish[];
+  @OneToMany(type => Dish, dish => dish.restaurant)
+  @Field(type => [Dish])
+  menu: Dish[];
 
-    @OneToMany(type => Order, order => order.restaurant)
-    @Field(type => [Order])
-    orders: Order[];
+  @OneToMany(type => Order, order => order.restaurant)
+  @Field(type => [Order])
+  orders: Order[];
 }

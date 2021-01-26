@@ -8,71 +8,71 @@ import { Restaurant } from "src/restaurants/entities/restaurant.entity";
 import { Order } from "src/orders/entities/order.entity";
 
 export enum UserRole {
-    Client = "Client",
-    Owner = "Owner",
-    Delivery = "Delivery",
+  Client = "Client",
+  Owner = "Owner",
+  Delivery = "Delivery",
 }
 
-registerEnumType(UserRole, {name: "UserRole"}); // for GraphQl Type
+registerEnumType(UserRole, { name: "UserRole" }); // for GraphQl Type
 
 @InputType('UserInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
-export class User extends CoreEntity{
+export class User extends CoreEntity {
 
-    @Column({ unique: true })
-    @Field(type => String)
-    @IsEmail()
-    email: string;
+  @Column({ unique: true })
+  @Field(type => String)
+  @IsEmail()
+  email: string;
 
-    @Column({ select: false })
-    @Field(type => String)
-    @IsString()
-    password: string;
+  @Column({ select: false })
+  @Field(type => String)
+  @IsString()
+  password: string;
 
-    @Column({ type: "enum", enum: UserRole })
-    @Field(type => UserRole)
-    @IsEnum(UserRole)
-    role: UserRole;
+  @Column({ type: "enum", enum: UserRole })
+  @Field(type => UserRole)
+  @IsEnum(UserRole)
+  role: UserRole;
 
-    @Column({ default: false })
-    @Field(type => Boolean)
-    @IsBoolean()
-    verified: boolean;
+  @Column({ default: false })
+  @Field(type => Boolean)
+  @IsBoolean()
+  verified: boolean;
 
-    @OneToMany(type => Restaurant, restaurant => restaurant.owner)
-    @Field(type => [Restaurant])
-    restaurants: Restaurant[];
+  @OneToMany(type => Restaurant, restaurant => restaurant.owner)
+  @Field(type => [Restaurant])
+  restaurants: Restaurant[];
 
-    @OneToMany(type => Order, order => order.customer)
-    @Field(type => [Order])
-    orders: Order[];
+  @OneToMany(type => Order, order => order.customer)
+  @Field(type => [Order])
+  orders: Order[];
 
-    
-    @OneToMany(type => Order, order => order.driver)
-    @Field(type => [Order])
-    rides: Order[];
 
-    @BeforeUpdate()
-    @BeforeInsert()
-    async hashPassword(): Promise<void> {
-        if(this.password) {
-            try {
-                this.password = await bcrypt.hash(this.password, 10);
-            } catch(e) {
-                console.log(e);
-                throw new InternalServerErrorException();
-            }
-        }
+  @OneToMany(type => Order, order => order.driver)
+  @Field(type => [Order])
+  rides: Order[];
+
+  @BeforeUpdate()
+  @BeforeInsert()
+  async hashPassword(): Promise<void> {
+    if (this.password) {
+      try {
+        this.password = await bcrypt.hash(this.password, 10);
+      } catch (e) {
+        console.log(e);
+        throw new InternalServerErrorException();
+      }
     }
+  }
 
-    async checkPassword(aPassword: string): Promise<boolean> {
-        try {
-            const result = await bcrypt.compare(aPassword, this.password);
-            return result;
-        } catch(e) {
-            console.log(e);
-            throw new InternalServerErrorException();
-        }
+  async checkPassword(aPassword: string): Promise<boolean> {
+    try {
+      const result = await bcrypt.compare(aPassword, this.password);
+      return result;
+    } catch (e) {
+      console.log(e);
+      throw new InternalServerErrorException();
     }
+  }
 }

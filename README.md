@@ -42,7 +42,11 @@ The Backend of Ouber Eats Clone
 [x] Edit Dish
 [x] Delete Dish
 
-- Orders CRUD
+[X] Orders CREATE
+[X] Orders READ
+[X] Orders Update
+
+
 - Orders Subscription (Owner, Client, Delivery)
 
 - Payments (Cron jobs)
