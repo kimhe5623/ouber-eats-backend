@@ -47,6 +47,13 @@ The Backend of Ouber Eats Clone
 [X] Orders Update
 
 
-- Orders Subscription (Owner, Client, Delivery)
+- Orders Subscription:
+
+  - Pending Orders (s: newOrder) (t: createOrder(newOrder))
+  - Cancel request (Owner)
+  - Cancel accepted (Customer) 
+  - Order Status (Customer, Delivery, Owner) (s: orderUpdate) (t: editOrder(orderUpdate))
+  - Pending Pickup Order (Delivery) (s: orderUpdate) (t: editOrder(orderUpdate))
+
 
 - Payments (Cron jobs)

@@ -2,7 +2,7 @@ import { Inject } from "@nestjs/common";
 import { Args, Mutation, Query, Resolver, Subscription } from "@nestjs/graphql";
 import { AuthUser } from "src/auth/auth-user.decorator";
 import { Role } from "src/auth/role.decorator";
-import { PUB_SUB } from "src/common/common.constants";
+import { NEW_PENDING_ORDER, PUB_SUB } from "src/common/common.constants";
 import { CreateDishOutput } from "src/restaurants/dtos/create-dish.dto";
 import { User } from "src/users/entities/user.entity";
 import { CreateOrderInput, CreateOrderOutput } from "./dtos/create-order.dto";
@@ -12,6 +12,7 @@ import { GetOrdersInput, GetOrdersOutput } from "./dtos/get-orders.dto";
 import { Order } from "./entities/order.entity";
 import { OrderService } from "./orders.service";
 import { PubSub } from "graphql-subscriptions";
+import { pubsub } from "src/common/common.module";
 
 @Resolver(of => Order)
 export class OrderResolver {
@@ -57,23 +58,15 @@ export class OrderResolver {
     return this.ordersService.editOrder(user, editOrderInput);
   }
 
-  @Subscription(returns => String, {
-    filter: ({ readyPotato }, { potatoId }) => {
-      return readyPotato === potatoId;
+  @Subscription(returns => Order, {
+    filter: ({ pendingOrders: { order, ownerId } }, _, { user }) => {
+      console.log(ownerId, user.id);
+      return user.id === ownerId;
     },
-    resolve: ({ readyPotato }) => `Your potato with the id ${readyPotato} is ready!`
+    resolve: ({ pendingOrders: { order } }) => order
   })
-  @Role(['Any'])
-  readyPotato(
-    @AuthUser() user: User,
-    @Args('potatoId') potatoId: number
-  ) {
-    return this.pubSub.asyncIterator('hotPotatoes');
-  }
-
-  @Mutation(returns => Boolean)
-  async potatoReady(@Args('potatoId') potatoId: number) {
-    await this.pubSub.publish('hotPotatoes', { readyPotato: potatoId })
-    return true;
+  @Role(['Owner'])
+  pendingOrders() {
+    return this.pubSub.asyncIterator(NEW_PENDING_ORDER);
   }
 }
