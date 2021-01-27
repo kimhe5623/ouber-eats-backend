@@ -18,6 +18,9 @@ import { Dish } from './restaurants/entities/dish.entity';
 import { OrdersModule } from './orders/orders.module';
 import { Order } from './orders/entities/order.entity';
 import { OrderItem } from './orders/entities/order-item.entity';
+import { PaymentsModule } from './payment/payments.module';
+import { Payment } from './payment/entities/payment.entity';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -56,7 +59,8 @@ import { OrderItem } from './orders/entities/order-item.entity';
         Category,
         Dish,
         Order,
-        OrderItem
+        OrderItem,
+        Payment,
       ]
     }),
     GraphQLModule.forRoot({
@@ -82,6 +86,8 @@ import { OrderItem } from './orders/entities/order-item.entity';
     AuthModule,
     OrdersModule,
     CommonModule,
+    PaymentsModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [],
   providers: [],
